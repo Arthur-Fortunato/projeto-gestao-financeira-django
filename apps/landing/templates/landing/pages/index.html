@@ -1,0 +1,75 @@
+{% extends "landing/base.html" %}
+{% load static %}
+
+{% block title %}Gestão Financeira{% endblock %}
+{% block content %}
+
+    {% include "landing/partials/header.html" %}
+
+    <section class="master">
+        <div class="container master-content">
+            <div class="master-text">
+                <h1>Controle suas finanças de forma simples e inteligente</h1>
+                <p>
+                    Organize receitas, despesas e tenha visão clara do seu dinheiro.
+                    Tome decisões financeiras melhores com dados reais.
+                </p>
+
+                <a href="#" class="btn-primary btn-large">
+                    Começar agora
+                </a>
+            </div>
+
+            <div class="master-icon">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+        </div>
+    </section>
+
+    <section class="about-section reveal">
+        <div class="container about-content">
+            <div class="about-image">
+                <img src="{% static 'landing/images/finance-img.jpg' %}" alt="imagem de notebook e cédulas">
+            </div>
+
+            <div class="about-text">
+                <h2>Assuma o controle da sua vida financeira</h2>
+                <p>
+                    Registre suas entradas e despesas, acompanhe relatórios claros
+                    e tenha uma visão completa do seu dinheiro.
+                </p>
+                <p>
+                    Organização financeira não é sobre ganhar mais.
+                    É sobre saber exatamente para onde seu dinheiro está indo.
+                </p>
+
+                <a href="#" class="btn-primary btn-large">
+                    Criar minha conta
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="features reveal">
+        <div class="container features-grid">
+            <div class="feature-card">
+                <i class="fa-solid fa-chart-pie"></i>
+                <h3>Relatórios Visuais</h3>
+                <p>Visualize seus gastos com gráficos claros e objetivos.</p>
+            </div>
+
+            <div class="feature-card">
+                <i class="fa-solid fa-money-bill-wave"></i>
+                <h3>Controle de Despesas</h3>
+                <p>Registre e categorize seus gastos facilmente.</p>
+            </div>
+
+            <div class="feature-card">
+                <i class="fa-solid fa-building-columns"></i>
+                <h3>Gestão por Empresa</h3>
+                <p>Ideal para pequenas empresas e uso pessoal.</p>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

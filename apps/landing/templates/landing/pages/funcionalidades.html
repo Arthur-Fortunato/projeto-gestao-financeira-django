@@ -1,0 +1,90 @@
+{% extends "landing/base.html" %}
+{% load static %}
+
+{% block title %}Funcionalidades{% endblock %}
+{% block content %}
+
+{% include "landing/partials/header.html" %}
+
+<section class="features-master">
+    <div class="container">
+        <h1>Funcionalidades Principais</h1>
+        <p>
+            Ferramentas desenvolvidas para simplificar sua organização financeira
+            e transformar dados em decisões inteligentes.
+        </p>
+    </div>
+</section>
+
+<section id="controle" class="feature-section reveal">
+    <div class="container feature-grid">
+        <div class="feature-text">
+            <h2>Controle de Receitas e Despesas</h2>
+            <p>
+                Registre todas as suas entradas e saídas de forma organizada.
+                Categorize movimentações, acompanhe histórico completo e
+                visualize sua situação financeira em tempo real.
+            </p>
+            <ul>
+                <li><i class="fa-solid fa-check"></i> Registro simplificado</li>
+                <li><i class="fa-solid fa-check"></i> Categorias personalizadas</li>
+                <li><i class="fa-solid fa-check"></i> Filtro por período</li>
+            </ul>
+        </div>
+
+        <div class="feature-image">
+            <img src="{% static 'landing/images/finance-control.jpg' %}" alt="Controle financeiro">
+        </div>
+    </div>
+</section>
+
+<section id="relatorios" class="feature-section alt reveal">
+    <div class="container feature-grid">
+        <div class="feature-image">
+            <img src="{% static 'landing/images/financial-reports.jpg' %}" alt="Relatórios financeiros">
+        </div>
+
+        <div class="feature-text">
+            <h2>Relatórios e Indicadores</h2>
+            <p>
+                Visualize gráficos claros e indicadores estratégicos que
+                mostram exatamente para onde seu dinheiro está indo.
+            </p>
+            <ul>
+                <li><i class="fa-solid fa-check"></i> Gráficos por categoria</li>
+                <li><i class="fa-solid fa-check"></i> Comparação mensal</li>
+                <li><i class="fa-solid fa-check"></i> Exportação para Excel</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section id="metas" class="feature-section reveal">
+    <div class="container feature-grid">
+        <div class="feature-text">
+            <h2>Metas Financeiras</h2>
+            <p>
+                Defina objetivos financeiros e acompanhe seu progresso
+                com indicadores visuais que mostram o quanto você já conquistou.
+            </p>
+            <ul>
+                <li><i class="fa-solid fa-check"></i> Metas mensais e anuais</li>
+                <li><i class="fa-solid fa-check"></i> Percentual atingido</li>
+                <li><i class="fa-solid fa-check"></i> Acompanhamento visual da meta</li>
+            </ul>
+        </div>
+
+        <div class="feature-image">
+            <img src="{% static 'landing/images/financial-meta.jpg' %}" alt="Metas financeiras">
+        </div>
+    </div>
+</section>
+
+<section class="features-cta reveal">
+    <div class="container">
+        <h2>Comece a organizar sua vida financeira hoje.</h2>
+        <a href="#" class="btn-primary btn-large">Criar minha conta</a>
+    </div>
+</section>
+
+{% endblock %}

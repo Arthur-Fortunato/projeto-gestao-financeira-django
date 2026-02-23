@@ -1,0 +1,71 @@
+{% extends "landing/base.html" %}
+{% load static %}
+
+{% block title %}Sobre{% endblock %}
+{% block content %}
+
+{% include "landing/partials/header.html" %}
+
+<section class="about-master">
+    <div class="container">
+        <h1>Sobre o Projeto</h1>
+        <p>
+            Uma plataforma desenvolvida para ajudar pessoas a organizarem
+            e entenderem melhor suas próprias finanças.
+        </p>
+    </div>
+</section>
+
+<section class="about-main">
+    <div class="container about-grid">
+
+        <div class="about-text">
+            <h2>Qual é o objetivo?</h2>
+            <p>
+                Este projeto foi desenvolvido para pessoas que desejam ter
+                controle real sobre suas receitas, despesas e metas financeiras.
+            </p>
+            <p>
+                A proposta é oferecer uma ferramenta simples, clara e eficiente
+                para transformar dados financeiros em decisões conscientes.
+            </p>
+        </div>
+
+        <div class="about-image">
+            <img src="{% static 'landing/images/organization-img.jpg' %}" alt="Organização financeira">
+        </div>
+
+    </div>
+</section>
+
+<section class="about-features reveal">
+    <div class="container">
+        <h2>Principais Funcionalidades</h2>
+
+        <div class="features-links">
+            <a href="{% url 'funcionalidades' %}#controle" class="feature-link">
+                <i class="fa-solid fa-money-bill-wave"></i>
+                Controle de Receitas e Despesas
+            </a>
+
+            <a href="{% url 'funcionalidades' %}#relatorios" class="feature-link">
+                <i class="fa-solid fa-chart-pie"></i>
+                Relatórios e Indicadores
+            </a>
+
+            <a href="{% url 'funcionalidades' %}#metas" class="feature-link">
+                <i class="fa-solid fa-bullseye"></i>
+                Metas Financeiras
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="about-cta reveal">
+    <div class="container">
+        <h2>Comece a transformar sua vida financeira hoje.</h2>
+        <a href="#" class="btn-primary btn-large">Criar minha conta</a>
+    </div>
+</section>
+
+{% endblock %}

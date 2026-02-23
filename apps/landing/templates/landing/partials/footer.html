@@ -1,0 +1,43 @@
+{% load static %}
+<footer class="footer">
+    <div class="container footer-grid">
+
+        <div class="footer-brand">
+            <h3>Gestão Financeira</h3>
+            <p>
+                Plataforma desenvolvida para auxiliar no controle
+                e organização financeira pessoal.
+            </p>
+        </div>
+
+        <div class="footer-links">
+            <h4>Navegação</h4>
+            <a href="{% url 'index' %}">Início</a>
+            <a href="{% url 'sobre' %}">Sobre</a>
+            <a href="{% url 'funcionalidades' %}">Funcionalidades</a>
+        </div>
+
+        <div class="footer-contact">
+            <h4>Contato</h4>
+
+            <div class="social-icons">
+                <a href="https://github.com/Arthur-Fortunato" target="_blank">
+                    <i class="fa-brands fa-github"></i>
+                </a>
+
+                <a href="https://linkedin.com/in/arthur-fortunato-ab6a4326a" target="_blank">
+                    <i class="fa-brands fa-linkedin"></i>
+                </a>
+
+                <a href="mailto:arthur.r.t.fortunato@gmail.com">
+                    <i class="fa-solid fa-envelope"></i>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer-bottom">
+        <p><i class="fa-regular fa-copyright"></i><bold><strong> 2026 Gestão Financeira. Desenvolvido por Arthur Ribeiro Telles Fortunato.</strong></bold></p>
+    </div>
+</footer>
