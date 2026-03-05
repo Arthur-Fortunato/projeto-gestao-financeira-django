@@ -1,16 +1,16 @@
 {% extends "accounts/base.html" %}
 {% load static %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Cadastro{% endblock %}
 
 {% block content %}
 
 <div class="auth-wrapper">
     <div class="auth-card">
 
-        <h1>Entrar</h1>
+        <h1>Cadastre-se</h1>
         <p class="auth-subtitle">
-            Acesse sua conta para continuar.
+            Cadastre-se para ter acesso ao conteúdo oferecido.
         </p>
 
         <form method="POST" class="auth-form">
@@ -32,8 +32,8 @@
         </form>
 
         <div class="auth-footer">
-            Não possui conta?
-            <a href="{% url 'accounts:cadastro' %}">Criar conta</a>
+            Já tem uma conta?
+            <a href="{% url 'accounts:login' %}">Entrar</a>
         </div>
 
     </div>
