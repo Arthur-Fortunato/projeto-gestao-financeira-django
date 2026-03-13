@@ -7,7 +7,6 @@
 
 <div class="auth-wrapper">
     <div class="auth-card">
-
         <h1>Entrar</h1>
         <p class="auth-subtitle">
             Acesse sua conta para continuar.
@@ -17,7 +16,7 @@
             {% csrf_token %}
 
             <div class="form-group">
-                <label>Usuário</label>
+                <label>Email</label>
                 <input type="email" name="username" placeholder="Seu email" required>
             </div>
 
@@ -29,6 +28,14 @@
             <button type="submit" class="btn-primary">
                 Entrar
             </button>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
         </form>
 
         <div class="auth-footer">
