@@ -7,6 +7,14 @@
 
 <div class="auth-wrapper">
     <div class="auth-card">
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
 
         <h1>Cadastre-se</h1>
         <p class="auth-subtitle">
@@ -18,7 +26,7 @@
 
             <div class="form-group">
                 <label>Usuário</label>
-                <input type="email" name="username" placeholder="Seu email" required>
+                <input type="email" name="email" placeholder="Seu email" required>
             </div>
 
             <div class="form-group">
@@ -26,8 +34,13 @@
                 <input type="password" name="password" placeholder="Sua senha" required>
             </div>
 
+            <div class="form-group">
+                <label>Confirmar senha</label>
+                <input type="password" name="password2" placeholder="Repita sua senha" required>
+            </div>
+
             <button type="submit" class="btn-primary">
-                Entrar
+                Criar conta
             </button>
         </form>
 
