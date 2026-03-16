@@ -14,7 +14,7 @@ def login_view(request):
             return redirect("accounts:login")
 
         login(request, user)
-        return redirect("landing:index") # tenho que mudar esse caminho tbm
+        return redirect("finances:dashboard") 
     return render(request, "accounts/pages/login.html")
 
 def cadastro_view(request):
@@ -36,6 +36,5 @@ def cadastro_view(request):
         )
         
         login(request, user)
-        messages.success(request, "Conta criada com sucesso!")
-        return redirect("landing:index") # tenho que mudar isso depois
+        return redirect("finances:dashboard") 
     return render(request, "accounts/pages/cadastro.html")
