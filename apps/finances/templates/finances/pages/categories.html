@@ -1,0 +1,55 @@
+{% extends 'finances/base.html' %}
+{% block content %}
+<section class="incomes-page">
+    <div class="form-column">
+        <h2>Nova categoria</h2>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Nome</label>
+                <input type="text" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label>Tipo</label>
+                <select name="type">
+                    <option value="income">Receita</option>
+                    <option value="expense">Despesa</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-primary">
+                Criar categoria
+            </button>
+        </form>
+    </div>
+
+    <div class="list-column">
+        <h2>Minhas categorias</h2>
+        {% for category in categories %}
+            <div class="income-card">
+                <h3>{{ category.name }}</h3>
+
+                <p>
+                    Tipo:
+                    {% if category.type == "income" %}
+                        Receita
+                    {% else %}
+                        Despesa
+                    {% endif %}
+                </p>
+
+                <form method="post" action="{% url 'finances:delete_category' category.id %}">
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirm('Excluir categoria?')">
+                        Excluir
+                    </button>
+                </form>
+            </div>
+        {% empty %}
+            <p>Nenhuma categoria criada ainda.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

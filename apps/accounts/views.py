@@ -14,7 +14,7 @@ def login_view(request):
             return redirect("accounts:login")
 
         login(request, user)
-        return redirect("finances:dashboard") 
+        return redirect("finances:incomes") #trocar para dashboard futuramente
     return render(request, "accounts/pages/login.html")
 
 def cadastro_view(request):
@@ -36,5 +36,5 @@ def cadastro_view(request):
         )
         
         login(request, user)
-        return redirect("finances:dashboard") 
+        return redirect("finances:incomes") #trocar para dashboard futuramente 
     return render(request, "accounts/pages/cadastro.html")

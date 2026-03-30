@@ -1,0 +1,46 @@
+{% extends 'finances/base.html' %}
+{% block content %}
+<div class="form-column" style="max-width: 500px; margin: 40px auto;">
+    <h2>Editar receita</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            {{ form.title.label_tag }}
+            {{ form.title }}
+        </div>
+
+        <div class="form-group">
+            {{ form.amount.label_tag }}
+            {{ form.amount }}
+        </div>
+
+        <div class="form-group">
+            {{ form.category.label_tag }}
+            {{ form.category }}
+        </div>
+
+        <div class="form-group">
+            {{ form.date.label_tag }}
+            {{ form.date }}
+        </div>
+
+        <div class="form-group">
+            {{ form.is_fixed.label_tag }}
+            {{ form.is_fixed }}
+        </div>
+
+        <div class="form-group">
+            {{ form.notes.label_tag }}
+            {{ form.notes }}
+        </div>
+
+        <button type="submit" class="btn-primary">
+            Salvar alterações
+        </button>
+
+    </form>
+</div>
+
+{% endblock %}

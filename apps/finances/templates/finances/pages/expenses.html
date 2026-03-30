@@ -1,0 +1,151 @@
+{% extends 'finances/base.html' %}
+{% load static %}
+{% block content %}
+<section class="incomes-page">
+    <div class="form-column">
+        <h2>Adicionar despesa</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                {{ form.title.label_tag }}
+                {{ form.title }}
+            </div>
+
+            <div class="form-group">
+                {{ form.amount.label_tag }}
+                {{ form.amount }}
+            </div>
+
+            <div class="form-group">
+                {{ form.category.label_tag }}
+
+                <div class="category-row">
+                    {{ form.category }}
+
+                    <a href="{% url 'finances:categories' %}" class="add-category-btn" title="Criar nova Categoria">
+                        +
+                    </a>
+                </div>
+            </div>
+
+            <div class="form-group">
+                {{ form.date.label_tag }}
+                {{ form.date }}
+            </div>
+
+            <div class="form-group">
+                {{ form.is_fixed.label_tag }}
+                {{ form.is_fixed }}
+            </div>
+
+            <div class="form-group">
+                {{ form.notes.label_tag }}
+                {{ form.notes }}
+            </div>
+
+            <button type="submit" class="btn-primary">
+                Salvar despesa
+            </button>
+        </form>
+    </div>
+
+    <div class="list-column">
+        <h2>Minhas despesas</h2>
+        {% for expense in expenses %}
+            <div class="income-card">
+
+                <h3>{{ expense.title }}</h3>
+
+                <p><strong>Valor:</strong> R$ {{ expense.amount }}</p>
+                <p><strong>Categoria:</strong> {{ expense.category }}</p>
+                <p><strong>Data:</strong> {{ expense.date }}</p>
+                <p><strong>Fixa:</strong> {% if expense.is_fixed %}Sim{% else %}Não{% endif %}</p>
+                <p><strong>Observações:</strong> {% if expense.notes %}{{ expense.notes }}{% else %}Nenhuma observação{% endif %}</p>
+
+                <div class="recepts-list-buttons">
+                <button type="button"
+                    class="edit-btn"
+                    data-type="expense"
+                    data-id="{{ expense.id }}"
+                    data-title="{{ expense.title }}"
+                    data-amount="{{ expense.amount }}"
+                    data-category="{{ expense.category.id }}"
+                    data-date="{{ expense.date }}"
+                    data-fixed="{{ expense.is_fixed }}"
+                    data-notes="{{ expense.notes }}">
+                    Editar
+                </button>
+
+                <form method="post" action="{% url 'finances:delete_expense' expense.id %}">
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirm('Excluir despesa?')">
+                        Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% empty %}
+            <p>Nenhuma despesa cadastrada ainda.</p>
+        {% endfor %}
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal">
+
+        <div class="modal-header">
+            <h2>Editar receita</h2>
+            <button id="close-modal">&times;</button>
+        </div>
+
+        <form method="post" id="modal-form">
+            {% csrf_token %}
+            <input type="hidden" name="object_id" id="modal-object-id">
+            <input type="hidden" name="object_type" id="modal-object-type">
+
+            <div class="form-group">
+                <label>Título</label>
+                <input type="text" name="title" id="modal-title">
+            </div>
+
+            <div class="form-group">
+                <label>Valor</label>
+                <input type="number" step="0.01" name="amount" id="modal-amount">
+            </div>
+
+            <div class="form-group">
+                <label>Categoria</label>
+                <select name="category" id="modal-category">
+                    {% for cat in form.category.field.queryset %}
+                        <option value="{{ cat.id }}">{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Data</label>
+                <input type="date" name="date" id="modal-date">
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="is_fixed" id="modal-fixed">
+                    Fixa
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label>Observações</label>
+                <textarea name="notes" id="modal-notes"></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary">
+                Salvar
+            </button>
+        </form>
+    </div>
+</div>
+</section>
+<script src="{% static "finances/js/updateModal.js" %}"></script>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% load static %}
+<header class="main-header">
+    <div class="header-container">
+
+        <div class="header-left">
+            <h1 class="logo"><a class="header-logo" href="{% url 'finances:dashboard' %}">FINANÇAS</a></h1>
+        </div>
+
+        <nav class="header-nav">
+            <a href="{% url 'finances:dashboard' %}">Dashboard</a>
+            <a href="#">Metas</a>
+            <a href="{% url 'finances:incomes' %}">Receitas</a>
+            <a href="{% url 'finances:expenses' %}">Despesas</a>
+            <a href="{% url 'finances:categories' %}">Categorias</a>
+        </nav>
+
+        <div class="header-right">
+            <span class="user-email">
+                {{ request.user.email }}
+            </span>
+
+            <form method="post" action="{% url 'finances:logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">
+                    Sair
+                </button>
+            </form>
+        </div>
+
+    </div>
+</header>

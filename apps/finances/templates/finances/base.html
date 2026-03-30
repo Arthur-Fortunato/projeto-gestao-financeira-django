@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'finances/css/incomes.css' %}">
+    <link rel="stylesheet" href="{% static 'finances/css/header.css' %}">
+    <link rel="stylesheet" href="{% static 'finances/css/footer.css' %}">
+    <link rel="stylesheet" href="{% static 'finances/css/messages.css' %}">
+
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+    {% include "finances/partials/header.html" %}
+    {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+                <div class="alert {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include "finances/partials/footer.html" %}
+</body>
+</html>
