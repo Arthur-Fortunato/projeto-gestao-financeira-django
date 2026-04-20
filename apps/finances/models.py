@@ -46,19 +46,23 @@ class Expense(models.Model):
 
 
 class Goal(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="goals")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=150)
     target_amount = models.DecimalField(max_digits=10, decimal_places=2)
     current_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    deadline = models.DateField(null=True,blank=True)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property
     def progress(self):
         if self.target_amount == 0:
             return 0
-        percentage = (self.current_amount / self.target_amount) * 100
-        return min(percentage, 100)
+        return (self.current_amount / self.target_amount) * 100
+
+    @property
+    def remaining(self):
+        return max(self.target_amount - self.current_amount, 0)
 
     def __str__(self):
         return self.title

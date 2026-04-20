@@ -1,8 +1,85 @@
-{% extends "base.html" %}
-{% block title %}Dashboard{% endblock title %}
+{% extends "finances/base.html" %}
+{% block title %}Dashboard | Gestão Financeira{% endblock %}
 
 {% block content %}
-<h1>Dashboard</h1>
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Dashboard</h1>
+        <p>Acompanhe suas receitas, despesas e o progresso das suas metas.</p>
+    </div>
 
+    <div class="metrics-grid">
+        <div class="metric-card balance">
+            <div class="metric-icon">💰</div>
+            <div class="metric-content">
+                <h3>Saldo Atual</h3>
+                <p class="metric-value {% if balance >= 0 %}positive{% else %}negative{% endif %}">
+                    R$ {{ balance|floatformat:2 }}
+                </p>
+            </div>
+        </div>
 
+        <div class="metric-card income">
+            <div class="metric-icon">⬆️</div>
+            <div class="metric-content">
+                <h3>Total Receitas</h3>
+                <p class="metric-value">R$ {{ total_incomes|floatformat:2 }}</p>
+            </div>
+        </div>
+
+        <div class="metric-card expense">
+            <div class="metric-icon">⬇️</div>
+            <div class="metric-content">
+                <h3>Total Despesas</h3>
+                <p class="metric-value">R$ {{ total_expenses|floatformat:2 }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-main">
+        <div class="section-card">
+            <h2>Últimas Receitas</h2>
+            <div class="recent-list">
+                {% for income in recent_incomes %}
+                <div class="recent-item">
+                    <div class="item-info">
+                        <span class="item-title">{{ income.title }}</span>
+                        <span class="item-date">{{ income.date|date:"d M, Y" }}</span>
+                    </div>
+                    <span class="item-amount">+ R$ {{ income.amount|floatformat:2 }}</span>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    Nenhuma receita adicionada ainda.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="section-card">
+            <h2>Suas Metas</h2>
+            <div class="goals-list">
+                {% for goal in goals %}
+                <div class="goal-item">
+                    <div class="goal-header">
+                        <span class="goal-title">{{ goal.title }}</span>
+                        <span class="goal-amounts">R$ {{ goal.current_amount|floatformat:2 }} / R$ {{ goal.target_amount|floatformat:2 }}</span>
+                    </div>
+                    <div class="goal-progress-wrapper">
+                        {% if goal.progress >= 100 %}
+                            <div class="goal-progress-fill" style="width: 100%; background: #10b981;"></div>
+                        {% else %}
+                            <div class="goal-progress-fill" style="width: {{ goal.progress|floatformat:0 }}%;"></div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    Você ainda não definiu nenhuma meta.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -5,10 +5,26 @@ from django.contrib import messages
 from django.db import IntegrityError
 from .models import *
 from .forms import *
+from decimal import Decimal, InvalidOperation
+from django.db.models import Sum
 
 @login_required
 def dashboard(request):
-    return render(request, "finances/pages/dashboard.html")
+    total_incomes = Income.objects.filter(user=request.user).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+    total_expenses = Expense.objects.filter(user=request.user).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+    balance = total_incomes - total_expenses
+    
+    recent_incomes = Income.objects.filter(user=request.user).order_by('-date')[:5]
+    goals = Goal.objects.filter(user=request.user).order_by('-created_at')
+    
+    context = {
+        'total_incomes': total_incomes,
+        'total_expenses': total_expenses,
+        'balance': balance,
+        'recent_incomes': recent_incomes,
+        'goals': goals,
+    }
+    return render(request, "finances/pages/dashboard.html", context)
 
 @login_required
 def incomes(request):
@@ -101,3 +117,70 @@ def delete_category(request, category_id):
 def logout_view(request):
     logout(request)
     return redirect("landing:index")
+
+@login_required
+def goals(request):
+    if request.method == "POST":
+        title = request.POST.get("title")
+        target_amount = request.POST.get("target_amount")
+        current_amount = request.POST.get("current_amount") or "0"
+        start_date = request.POST.get("start_date")
+        end_date = request.POST.get("end_date")
+        try:
+            target_amount = Decimal(target_amount)
+            current_amount = Decimal(current_amount)
+        except (InvalidOperation, TypeError):
+            messages.error(request, "Informe valores numéricos válidos.")
+            return redirect("finances:goals")
+
+        if target_amount < 0 or current_amount < 0:
+            messages.error(request, "Os valores não podem ser negativos.")
+            return redirect("finances:goals")
+
+        if start_date and end_date and start_date > end_date:
+            messages.error(request, "A data final deve ser maior que a data inicial.")
+            return redirect("finances:goals")
+
+        Goal.objects.create(
+            user=request.user,
+            title=title,
+            target_amount=target_amount,
+            current_amount=current_amount,
+            start_date=start_date or None,
+            end_date=end_date or None,
+        )
+        messages.success(request, "Meta criada com sucesso.")
+        return redirect("finances:goals")
+
+    goals = Goal.objects.filter(user=request.user).order_by("-created_at")
+    return render(request, "finances/pages/goals.html", {
+        "goals": goals,
+    })
+    
+@login_required
+def update_goal(request, goal_id):
+    goal = get_object_or_404(Goal, id=goal_id, user=request.user)
+    if request.method == "POST":
+        value = request.POST.get("current_amount")
+        try:
+            value = Decimal(value)
+        except (InvalidOperation, TypeError):
+            messages.error(request, "Informe um valor válido.")
+            return redirect("finances:goals")
+
+        if value <= 0:
+            messages.error(request, "Informe um valor maior que zero.")
+            return redirect("finances:goals")
+
+        goal.current_amount += value
+        goal.save()
+
+        messages.success(request, "Meta atualizada com sucesso.")
+    return redirect("finances:goals")
+
+@login_required
+def delete_goal(request, goal_id):
+    goal = get_object_or_404(Goal, id=goal_id, user=request.user)
+    if request.method == "POST":
+        goal.delete()
+    return redirect("finances:goals")

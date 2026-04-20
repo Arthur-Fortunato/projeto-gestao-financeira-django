@@ -11,11 +11,14 @@
     <link rel="stylesheet" href="{% static 'finances/css/header.css' %}">
     <link rel="stylesheet" href="{% static 'finances/css/footer.css' %}">
     <link rel="stylesheet" href="{% static 'finances/css/messages.css' %}">
+    <link rel="stylesheet" href="{% static 'finances/css/goals.css' %}">
+    <link rel="stylesheet" href="{% static 'finances/css/dashboard.css' %}">
 
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
     {% include "finances/partials/header.html" %}
+    
     {% if messages %}
         <div class="messages-container">
             {% for message in messages %}

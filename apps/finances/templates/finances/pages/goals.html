@@ -1,0 +1,107 @@
+{% extends 'finances/base.html' %}
+{% block content %}
+<section class="goals-page">
+    <div class="form-column">
+        <h2>Nova meta</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label>Título</label>
+                <input type="text" name="title" required>
+            </div>
+
+            <div class="form-group">
+                <label>Valor da meta</label>
+                <input type="number" step="0.01" name="target_amount" required>
+            </div>
+
+            <div class="form-group">
+                <label>Já guardado</label>
+                <input type="number" step="0.01" name="current_amount">
+            </div>
+
+            <div class="form-group">
+                <label>Data inicial</label>
+                <input type="date" name="start_date" required>
+            </div>
+
+            <div class="form-group">
+                <label>Data final</label>
+                <input type="date" name="end_date" required>
+            </div>
+
+            <button type="submit" class="btn-primary">
+                Criar meta
+            </button>
+        </form>
+    </div>
+
+    <div class="list-column">
+        <h2>Minhas metas</h2>
+
+        {% for goal in goals %}
+        <div class="goal-card">
+
+            <div class="goal-header">
+                <h3>{{ goal.title }}</h3>
+                <span class="goal-percentage">
+                    {% if goal.progress >= 100 %}
+                        🎉 {{ goal.progress|floatformat:0 }}%
+                    {% else %}
+                        {{ goal.progress|floatformat:0 }}%
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="goal-values">
+                <p><strong>Meta:</strong> R$ {{ goal.target_amount }}</p>
+                <p><strong>Saldo atual:</strong> R$ {{ goal.current_amount }}</p>
+                <p><strong>Falta:</strong> R$ {{ goal.remaining }}</p>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill 
+                    {% if goal.progress < 30 %}
+                        low
+                    {% elif goal.progress < 70 %}
+                        medium
+                    {% elif goal.progress <= 100 %}
+                        high
+                    {% else %}
+                        over
+                    {% endif %}
+                "
+                style="width: {% if goal.progress > 100 %}100{% else %}{{ goal.progress|floatformat:0 }}{% endif %}%;">
+                </div>
+            </div>
+
+            <div class="goal-dates">
+                <span>{{ goal.start_date }}</span>
+                <span>{{ goal.end_date }}</span>
+            </div>
+            
+            <div class="goal-actions">
+                <form method="post" action="{% url 'finances:update_goal' goal.id %}">
+                    {% csrf_token %}
+                    <input type="number" step="0.01" name="current_amount" placeholder="Adicionar saldo">
+                    <button type="submit" class="btn-update">Atualizar valor</button>
+                </form>
+    
+                <form method="post" action="{% url 'finances:delete_goal' goal.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-delete" onclick="return confirm('Excluir meta?')">
+                        Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+
+
+        {% empty %}
+            <p>Nenhuma meta criada ainda.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
