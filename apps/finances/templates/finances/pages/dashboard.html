@@ -1,4 +1,4 @@
-{% extends "finances/base.html" %}
+﻿{% extends "finances/base.html" %}
 {% block title %}Dashboard | Gestão Financeira{% endblock %}
 
 {% block content %}
@@ -36,6 +36,52 @@
         </div>
     </div>
 
+    <div class="dashboard-filters section-card">
+        <div class="filters-header">
+            <h2>Filtros do dashboard</h2>
+            <p>Filtre o período e a categoria para ver gráficos e métricas atualizadas.</p>
+        </div>
+        <form method="get" class="filters-form">
+            <div class="filter-row">
+                <label class="filter-field">
+                    <span>Data inicial</span>
+                    <input type="date" name="start_date" value="{{ start_date }}" />
+                </label>
+                <label class="filter-field">
+                    <span>Data final</span>
+                    <input type="date" name="end_date" value="{{ end_date }}" />
+                </label>
+                <label class="filter-field">
+                    <span>Categoria</span>
+                    <select name="category">
+                        <option value="">Todas</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if selected_category and selected_category.id == category.id %}selected{% endif %}>
+                            {{ category.name }} ({{ category.get_type_display }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </div>
+            <div class="filter-actions">
+                <button type="submit" class="button-primary">Aplicar filtros</button>
+                <a class="button-secondary" href="{% url 'finances:dashboard_export_csv' %}?{{ request.GET.urlencode }}">Exportar CSV</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="charts-grid">
+        <div class="section-card chart-card">
+            <h2>Fluxo de receitas e despesas</h2>
+            <canvas id="timelineChart"></canvas>
+        </div>
+
+        <div class="section-card chart-card">
+            <h2>Distribuição por categoria</h2>
+            <canvas id="categoryChart"></canvas>
+        </div>
+    </div>
+
     <div class="dashboard-main">
         <div class="section-card">
             <h2>Últimas Receitas</h2>
@@ -50,7 +96,7 @@
                 </div>
                 {% empty %}
                 <div class="empty-state">
-                    Nenhuma receita adicionada ainda.
+                    Nenhuma receita adicionada no período selecionado.
                 </div>
                 {% endfor %}
             </div>
@@ -82,4 +128,74 @@
         </div>
     </div>
 </div>
+
+{{ date_labels|json_script:"dateLabels" }}
+{{ incomes_series|json_script:"incomeSeries" }}
+{{ expenses_series|json_script:"expenseSeries" }}
+{{ category_labels|json_script:"categoryLabels" }}
+{{ category_totals|json_script:"categoryTotals" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const dateLabels = JSON.parse(document.getElementById('dateLabels').textContent);
+    const incomesSeries = JSON.parse(document.getElementById('incomeSeries').textContent);
+    const expensesSeries = JSON.parse(document.getElementById('expenseSeries').textContent);
+    const categoryLabels = JSON.parse(document.getElementById('categoryLabels').textContent);
+    const categoryTotals = JSON.parse(document.getElementById('categoryTotals').textContent);
+
+    new Chart(document.getElementById('timelineChart'), {
+        type: 'line',
+        data: {
+            labels: dateLabels,
+            datasets: [
+                {
+                    label: 'Receitas',
+                    data: incomesSeries,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.18)',
+                    fill: true,
+                    tension: 0.3,
+                },
+                {
+                    label: 'Despesas',
+                    data: expensesSeries,
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.18)',
+                    fill: true,
+                    tension: 0.3,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: { mode: 'index', intersect: false },
+            },
+            scales: {
+                x: { grid: { display: false } },
+                y: { beginAtZero: true },
+            },
+        },
+    });
+
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'doughnut',
+        data: {
+            labels: categoryLabels,
+            datasets: [{
+                data: categoryTotals,
+                backgroundColor: ['#6366f1', '#10b981', '#ef4444', '#f59e0b', '#0ea5e9', '#8b5cf6'],
+                borderColor: '#ffffff',
+                borderWidth: 2,
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' },
+            },
+        },
+    });
+</script>
 {% endblock %}

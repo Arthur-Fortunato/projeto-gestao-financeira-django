@@ -1,30 +1,155 @@
+import csv
+import datetime
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.db import IntegrityError
+from django.http import HttpResponse
 from .models import *
 from .forms import *
 from decimal import Decimal, InvalidOperation
 from django.db.models import Sum
 
+
+def parse_date(value):
+    try:
+        return datetime.datetime.strptime(value, '%Y-%m-%d').date()
+    except (TypeError, ValueError):
+        return None
+
+
+def get_default_period():
+    today = datetime.date.today()
+    return today.replace(day=1), today
+
+
 @login_required
 def dashboard(request):
-    total_incomes = Income.objects.filter(user=request.user).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
-    total_expenses = Expense.objects.filter(user=request.user).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+    start_date = parse_date(request.GET.get('start_date'))
+    end_date = parse_date(request.GET.get('end_date'))
+    if not start_date or not end_date:
+        start_date, end_date = get_default_period()
+
+    categories = Category.objects.filter(user=request.user).order_by('name')
+    selected_category = None
+    category_id = request.GET.get('category')
+    if category_id:
+        selected_category = categories.filter(id=category_id).first()
+
+    incomes = Income.objects.filter(user=request.user, date__range=(start_date, end_date))
+    expenses = Expense.objects.filter(user=request.user, date__range=(start_date, end_date))
+    if selected_category:
+        incomes = incomes.filter(category=selected_category)
+        expenses = expenses.filter(category=selected_category)
+
+    total_incomes = incomes.aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+    total_expenses = expenses.aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
     balance = total_incomes - total_expenses
-    
-    recent_incomes = Income.objects.filter(user=request.user).order_by('-date')[:5]
+
+    recent_incomes = incomes.order_by('-date')[:5]
     goals = Goal.objects.filter(user=request.user).order_by('-created_at')
-    
+
+    income_by_date = {
+        item['date']: item['total']
+        for item in incomes.values('date').annotate(total=Sum('amount')).order_by('date')
+    }
+    expense_by_date = {
+        item['date']: item['total']
+        for item in expenses.values('date').annotate(total=Sum('amount')).order_by('date')
+    }
+
+    date_labels = []
+    incomes_series = []
+    expenses_series = []
+    current_date = start_date
+    while current_date <= end_date:
+        date_labels.append(current_date.strftime('%d/%m'))
+        incomes_series.append(float(income_by_date.get(current_date, 0)))
+        expenses_series.append(float(expense_by_date.get(current_date, 0)))
+        current_date += datetime.timedelta(days=1)
+
+    category_data = {}
+    for item in incomes.values('category__name').annotate(total=Sum('amount')).order_by('category__name'):
+        name = item['category__name'] or 'Sem categoria'
+        category_data[name] = category_data.get(name, 0) + float(item['total'])
+    for item in expenses.values('category__name').annotate(total=Sum('amount')).order_by('category__name'):
+        name = item['category__name'] or 'Sem categoria'
+        category_data[name] = category_data.get(name, 0) + float(item['total'])
+
+    category_labels = list(category_data.keys())
+    category_totals = list(category_data.values())
+
     context = {
         'total_incomes': total_incomes,
         'total_expenses': total_expenses,
         'balance': balance,
         'recent_incomes': recent_incomes,
         'goals': goals,
+        'categories': categories,
+        'selected_category': selected_category,
+        'start_date': start_date,
+        'end_date': end_date,
+        'date_labels': date_labels,
+        'incomes_series': incomes_series,
+        'expenses_series': expenses_series,
+        'category_labels': category_labels,
+        'category_totals': category_totals,
     }
-    return render(request, "finances/pages/dashboard.html", context)
+    return render(request, 'finances/pages/dashboard.html', context)
+
+
+@login_required
+def dashboard_export_csv(request):
+    start_date = parse_date(request.GET.get('start_date'))
+    end_date = parse_date(request.GET.get('end_date'))
+    if not start_date or not end_date:
+        start_date, end_date = get_default_period()
+
+    categories = Category.objects.filter(user=request.user)
+    selected_category = None
+    category_id = request.GET.get('category')
+    if category_id:
+        selected_category = categories.filter(id=category_id).first()
+
+    incomes = Income.objects.filter(user=request.user, date__range=(start_date, end_date))
+    expenses = Expense.objects.filter(user=request.user, date__range=(start_date, end_date))
+    if selected_category:
+        incomes = incomes.filter(category=selected_category)
+        expenses = expenses.filter(category=selected_category)
+
+    rows = []
+    for income in incomes.order_by('date'):
+        rows.append([
+            'Receita',
+            income.date.isoformat(),
+            f'{income.amount:.2f}',
+            income.title,
+            income.category.name if income.category else '',
+            income.notes,
+        ])
+    for expense in expenses.order_by('date'):
+        rows.append([
+            'Despesa',
+            expense.date.isoformat(),
+            f'{expense.amount:.2f}',
+            expense.title,
+            expense.category.name if expense.category else '',
+            expense.notes,
+        ])
+    rows.sort(key=lambda item: item[1])
+
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="relatorio_mensal.csv"'
+    response.write('\ufeff')
+
+    writer = csv.writer(response, delimiter=';')
+    writer.writerow(['Tipo', 'Data', 'Valor', 'Título', 'Categoria', 'Observações'])
+    writer.writerows(rows)
+
+    return response
+
 
 @login_required
 def incomes(request):

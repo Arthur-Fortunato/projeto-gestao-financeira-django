@@ -5,6 +5,7 @@ app_name = "finances"
 
 urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('dashboard/export_csv/', views.dashboard_export_csv, name='dashboard_export_csv'),
     path("receitas/", views.incomes, name="incomes"),
     path("receitas/excluir/<int:income_id>/", views.delete_income, name="delete_income"),
     path("despesas/", views.expenses, name="expenses"),
