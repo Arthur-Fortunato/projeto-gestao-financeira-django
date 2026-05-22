@@ -71,15 +71,28 @@ def dashboard(request):
         current_date += datetime.timedelta(days=1)
 
     category_data = {}
+    category_types = {}
+    
     for item in incomes.values('category__name').annotate(total=Sum('amount')).order_by('category__name'):
         name = item['category__name'] or 'Sem categoria'
         category_data[name] = category_data.get(name, 0) + float(item['total'])
+        category_types[name] = 'income'
+    
     for item in expenses.values('category__name').annotate(total=Sum('amount')).order_by('category__name'):
         name = item['category__name'] or 'Sem categoria'
         category_data[name] = category_data.get(name, 0) + float(item['total'])
+        category_types[name] = 'expense'
 
-    category_labels = list(category_data.keys())
-    category_totals = list(category_data.values())
+    category_labels = []
+    category_totals = []
+    category_type_list = []
+    
+    for label in sorted(category_data.keys()):
+        type_label = category_types.get(label, 'expense')
+        type_text = 'receita' if type_label == 'income' else 'despesa'
+        category_labels.append(f"{label} ({type_text})")
+        category_totals.append(category_data[label])
+        category_type_list.append(type_label)
 
     context = {
         'total_incomes': total_incomes,
@@ -96,6 +109,7 @@ def dashboard(request):
         'expenses_series': expenses_series,
         'category_labels': category_labels,
         'category_totals': category_totals,
+        'category_types': category_type_list,
     }
     return render(request, 'finances/pages/dashboard.html', context)
 

@@ -342,13 +342,14 @@
 .charts-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.8rem;
+  gap: 1.5rem;
 }
 
 .chart-card canvas {
   width: 100% !important;
   height: auto !important;
-  min-height: 260px;
+  min-height: 200px;
+  max-height: 280px;
 }
 
 @media (max-width: 900px) {
