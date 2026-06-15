@@ -1,12 +1,11 @@
 import csv
 import datetime
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.db import IntegrityError
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from .models import *
 from .forms import *
 from decimal import Decimal, InvalidOperation
@@ -290,7 +289,7 @@ def goals(request):
             messages.error(request, "A data final deve ser maior que a data inicial.")
             return redirect("finances:goals")
 
-        Goal.objects.create(
+        goal = Goal.objects.create(
             user=request.user,
             title=title,
             target_amount=target_amount,
@@ -298,6 +297,13 @@ def goals(request):
             start_date=start_date or None,
             end_date=end_date or None,
         )
+
+        try:
+            if current_amount and current_amount != Decimal('0'):
+                GoalHistory.objects.create(goal=goal, amount=current_amount, note="Saldo inicial")
+        except NameError:
+            pass
+
         messages.success(request, "Meta criada com sucesso.")
         return redirect("finances:goals")
 
@@ -311,15 +317,20 @@ def update_goal(request, goal_id):
     goal = get_object_or_404(Goal, id=goal_id, user=request.user)
     if request.method == "POST":
         value = request.POST.get("current_amount")
+        note = request.POST.get("note") or ""
         try:
             value = Decimal(value)
         except (InvalidOperation, TypeError):
             messages.error(request, "Informe um valor válido.")
             return redirect("finances:goals")
-
-        if value <= 0:
-            messages.error(request, "Informe um valor maior que zero.")
+        if value == 0:
+            messages.error(request, "Informe um valor diferente de zero.")
             return redirect("finances:goals")
+
+        try:
+            GoalHistory.objects.create(goal=goal, amount=value, note=note)
+        except NameError:
+            pass
 
         goal.current_amount += value
         goal.save()
@@ -333,3 +344,17 @@ def delete_goal(request, goal_id):
     if request.method == "POST":
         goal.delete()
     return redirect("finances:goals")
+
+@login_required
+def goal_history(request, goal_id):
+    goal = get_object_or_404(Goal, id=goal_id, user=request.user)
+    entries = goal.history_entries.all()
+    data = [
+        {
+            "date": entry.created_at.strftime("%d/%m/%Y %H:%M"),
+            "amount": f"{entry.amount:.2f}",
+            "note": entry.note,
+        }
+        for entry in entries
+    ]
+    return JsonResponse(data, safe=False)

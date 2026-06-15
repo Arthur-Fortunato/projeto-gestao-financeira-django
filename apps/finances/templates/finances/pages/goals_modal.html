@@ -1,4 +1,4 @@
-{% extends 'finances/base.html' %} {% load static %} {% block content %}
+{% extends 'finances/base.html' %} {% block content %}
 <section class="goals-page">
   <div class="form-column">
     <h2>Nova meta</h2>
@@ -27,7 +27,6 @@
       <button type="submit" class="btn-primary">Criar meta</button>
     </form>
   </div>
-
   <div class="list-column">
     <h2>Minhas metas</h2>
     {% for goal in goals %}
@@ -91,7 +90,6 @@
     {% endfor %}
   </div>
 </section>
-
 <div id="modal-overlay" class="modal-overlay hidden">
   <div class="modal">
     <div class="modal-header">
@@ -103,6 +101,5 @@
     </div>
   </div>
 </div>
-
 <script src="{% static 'finances/js/goalsModal.js' %}"></script>
 {% endblock %}

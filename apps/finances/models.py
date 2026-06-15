@@ -31,6 +31,20 @@ class Income(models.Model):
         return self.title
 
 
+class GoalHistory(models.Model):
+    goal = models.ForeignKey('Goal', on_delete=models.CASCADE, related_name="history_entries")
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    note = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        sign = "+" if self.amount >= 0 else "-"
+        return f"{self.goal.title}: {sign} {abs(self.amount)} on {self.created_at}"
+
+
 class Expense(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="expenses")
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
