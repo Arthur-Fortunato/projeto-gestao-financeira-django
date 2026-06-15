@@ -34,10 +34,9 @@
     <div class="goal-card">
       <div class="goal-header">
         <h3>{{ goal.title }}</h3>
-        <span class="goal-percentage"
-          >{% if goal.progress >= 100 %}🎉 {{ goal.progress|floatformat:0 }}%{%
-          else %}{{ goal.progress|floatformat:0 }}%{% endif %}</span
-        >
+        <span class="goal-percentage">
+          {% if goal.progress >= 100 %}🎉 {{ goal.progress|floatformat:0 }}%{%else %}{{ goal.progress|floatformat:0 }}%{% endif %}
+        </span>
       </div>
       <div class="goal-values">
         <p><strong>Meta:</strong> R$ {{ goal.target_amount }}</p>
