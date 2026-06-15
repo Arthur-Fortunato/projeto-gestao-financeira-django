@@ -128,10 +128,7 @@
         <div class="goal-item">
           <div class="goal-header">
             <span class="goal-title">{{ goal.title }}</span>
-            <span class="goal-amounts"
-              >R$ {{ goal.current_amount|floatformat:2 }} / R$ {{
-              goal.target_amount|floatformat:2 }}</span
-            >
+            <span class="goal-amounts">R$ {{ goal.current_amount|floatformat:2 }} / R$ {{ goal.target_amount|floatformat:2 }}</span>
           </div>
           <div class="goal-progress-wrapper">
             {% if goal.progress >= 100 %}

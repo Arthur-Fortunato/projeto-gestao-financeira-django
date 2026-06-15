@@ -51,24 +51,34 @@ def dashboard(request):
     recent_incomes = incomes.order_by('-date')[:5]
     goals = Goal.objects.filter(user=request.user).order_by('-created_at')
 
-    income_by_date = {
-        item['date']: item['total']
-        for item in incomes.values('date').annotate(total=Sum('amount')).order_by('date')
-    }
-    expense_by_date = {
-        item['date']: item['total']
-        for item in expenses.values('date').annotate(total=Sum('amount')).order_by('date')
-    }
+    income_by_month_formatted = {}
+    expense_by_month_formatted = {}
+    
+    for item in incomes.values('date__year', 'date__month').annotate(total=Sum('amount')).order_by('date__year', 'date__month'):
+        key = (item['date__year'], item['date__month'])
+        income_by_month_formatted[key] = float(item['total'])
+    
+    for item in expenses.values('date__year', 'date__month').annotate(total=Sum('amount')).order_by('date__year', 'date__month'):
+        key = (item['date__year'], item['date__month'])
+        expense_by_month_formatted[key] = float(item['total'])
 
     date_labels = []
     incomes_series = []
     expenses_series = []
-    current_date = start_date
-    while current_date <= end_date:
-        date_labels.append(current_date.strftime('%d/%m'))
-        incomes_series.append(float(income_by_date.get(current_date, 0)))
-        expenses_series.append(float(expense_by_date.get(current_date, 0)))
-        current_date += datetime.timedelta(days=1)
+    
+    current_month = start_date.replace(day=1)
+    end_month = end_date.replace(day=1)
+    
+    while current_month <= end_month:
+        month_key = (current_month.year, current_month.month)
+        date_labels.append(current_month.strftime('%m/%Y'))
+        incomes_series.append(income_by_month_formatted.get(month_key, 0))
+        expenses_series.append(expense_by_month_formatted.get(month_key, 0))
+        
+        if current_month.month == 12:
+            current_month = current_month.replace(year=current_month.year + 1, month=1)
+        else:
+            current_month = current_month.replace(month=current_month.month + 1)
 
     category_data = {}
     category_types = {}
